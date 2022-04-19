@@ -102,7 +102,7 @@ class NR_1_0_8(fgSiva.Encoding):
 # In[ ]:
 
 
-EbNo_dB = np.arange(0,6,0.5)
+EbNo_dB = np.arange(0,2.5,0.5)
 
 
 # # Run the encoding and decoding
@@ -180,11 +180,17 @@ for i in range(len(EbNo_dB)):
             else:
                 tmp[varnodeid-1]=0
         
-        if np.sum(c != tmp) != 0:
+        cHt = np.zeros(N)
+
+        for varnodeid in LDPCFactorGraph.varlist:
+            tmp = LDPCFactorGraph.getextrinsicestimate(varnodeid)
+            cHt[varnodeid - 1] = np.argmax(tmp)
+
+        if np.sum(c != cHt) != 0:
             n_errs+=1
-            err_fixed+=(np.sum(c != tmp))
+            err_fixed+=(np.sum(c != cHt))
         n_iter+=1
-    
+    print(n_iter,EbNo_dB[i])
     err[i] = err_fixed/(n_iter*N)
 
 
@@ -198,8 +204,8 @@ plt.semilogy(EbNo_dB,err,'r')
 plt.xlabel('EbNo_dB')
 plt.ylabel('Bit error rate : Codeword')
 plt.title('Monte-Carlo simulations')
-plt.ylim(0.0000001,5)
-#plt.show()
+plt.ylim(0.000000001,5)
+plt.show()
 
 
 # In[ ]:
