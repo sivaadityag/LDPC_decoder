@@ -184,7 +184,7 @@ for i in range(len(EbNo_dB)):
             n_errs+=1
             err_fixed+=(np.sum(c != tmp))
         n_iter+=1
-    print(i,n_iter)
+    
     err[i] = err_fixed/(n_iter*N)
 
 
@@ -198,7 +198,7 @@ plt.semilogy(EbNo_dB,err,'r')
 plt.xlabel('EbNo_dB')
 plt.ylabel('Bit error rate : Codeword')
 plt.title('Monte-Carlo simulations')
-plt.ylim(0.000001,5)
+plt.ylim(0.0000001,5)
 #plt.show()
 
 
@@ -208,5 +208,5 @@ plt.ylim(0.000001,5)
 # import pathlib
 # import os
 # current_dir = pathlib.Path(__file__).parent
-# plt.savefig(os.path.join(current_dir, "BER vs Eb_NodB.png"))
+plt.savefig(os.path.join(current_dir, "BER vs Eb_NodB.png"))
 
