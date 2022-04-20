@@ -54,6 +54,10 @@ class NR_1_0_8(fgSiva.Encoding):
             
             super().__init__(self.Check2VarEdges, None, seclength)
 
+# Open the file to write values
+
+file=open(r'C:\Users\SIVA ADITYA GOOTY\Desktop\Git\LDPC_decoder\values.txt','w')
+
 # Define SNR points
 
 EbNo_dB = np.arange(0,2.5,0.5)
@@ -65,7 +69,7 @@ err_values = np.zeros(len(EbNo_dB))
 
 # Number of error acuumulations
 
-err_acc = 25
+err_acc = 50
 
 for point in range(len(EbNo_dB)):
     
@@ -82,13 +86,17 @@ for point in range(len(EbNo_dB)):
         # Variance calculation :
 
         EbNo[point] = 10**(EbNo_dB[point]/10)
-        rate = ((N-m)/N)
+        rate = ((N-m)/(N-2*Z))
         nvar = 1/(2*rate*EbNo[point])
 
 
         # Initialize LDPC factor graph
 
         LDPCFactorGraph = NR_1_0_8()
+
+        # Pull the parity matrix and store for future  parity checks
+
+        H = LDPCFactorGraph.paritycheckmatrix
 
         # All zero msg
 
@@ -143,33 +151,59 @@ for point in range(len(EbNo_dB)):
 
         # LDPCFactorGraph.printgraphcontent()
         
-        # Run message-passing algorithm on graph
+        # Run message-passing algorithm on graph for following max iterations
 
         numIterations = 50
 
         for idxiteration in range(numIterations):
+
             LDPCFactorGraph.updatechecks()
             LDPCFactorGraph.updatevars()
+
+            # Temporary codeword
+
+            tmp = np.zeros(N)
+
+            for varnodeid in LDPCFactorGraph.varlist:
+
+                tmp[varnodeid - 1] = LDPCFactorGraph.getextrinsicestimate(varnodeid) + LDPCFactorGraph.getobservation(varnodeid)
+
+                # Thresholding for BPSK
+
+                if tmp[varnodeid - 1] < 0:
+
+                    tmp[varnodeid - 1] = 1
+
+                else:
+
+                    tmp[varnodeid - 1] = 0
+
+            # Check if the current codeword satifies parity constraint
+
+            Parity_check = np.matmul(H,tmp.T)
+
+            if np.all(Parity_check == 0):
+                break
             # print("######",idxiteration)
             # LDPCFactorGraph.printgraphcontent()
-            
+
         # Extract information from graph
 
-        tmp = np.zeros(N)
+        # tmp = np.zeros(N)
 
-        for varnodeid in LDPCFactorGraph.varlist:
-
-            tmp[varnodeid-1] = LDPCFactorGraph.getextrinsicestimate(varnodeid)+LDPCFactorGraph.getobservation(varnodeid)
-
-            # Thresholding for BPSK
-
-            if tmp[varnodeid-1]<0:
-
-                tmp[varnodeid-1]=1
-
-            else:
-
-                tmp[varnodeid-1]=0
+        # for varnodeid in LDPCFactorGraph.varlist:
+        #
+        #     tmp[varnodeid-1] = LDPCFactorGraph.getextrinsicestimate(varnodeid)+LDPCFactorGraph.getobservation(varnodeid)
+        #
+        #     # Thresholding for BPSK
+        #
+        #     if tmp[varnodeid-1]<0:
+        #
+        #         tmp[varnodeid-1]=1
+        #
+        #     else:
+        #
+        #         tmp[varnodeid-1]=0
 
         # Accumulate the errors
 
@@ -188,7 +222,6 @@ for point in range(len(EbNo_dB)):
 
     print(n_iter,err_values[point],EbNo_dB[point])
 
-    file=open(os.path.join(current_dir,'values.txt'),'w')
     file.write(str(err_values[point])+"\n")
     
 file.close()
@@ -196,14 +229,15 @@ file.close()
 # BER VS EbNo_dB plot
 
 
-plt.semilogy(EbNo_dB,err_values,'r')
+plt.semilogy(EbNo_dB,err_values,'-*r')
+plt.grid(True,which="both",ls="-")
 plt.xlabel('EbNo_dB')
-plt.ylabel('Bit error rate : Codeword')
+plt.ylabel('Codeword error rate')
 plt.title('Monte-Carlo simulations')
 
 plt.show()
 
 
 
-plt.savefig(os.path.join(current_dir, "BER vs Eb_NodB.png"))
+# plt.savefig(os.path.join(current_dir, "BER vs Eb_NodB.png"))
 

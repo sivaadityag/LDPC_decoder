@@ -505,18 +505,19 @@ class Encoding(BipartiteGraph):
     def __init__(self, check2varedges, infonodeindices, seclength):
         super().__init__(check2varedges, seclength)
 
-        paritycheckmatrix = []
+        self.paritycheckmatrix = []
         for checknodeid in self.checklist:
             row = np.zeros(self.varcount, dtype=int)
             for idx in self.getchecknode(checknodeid).neighbors:
                 row[idx - 1] = 1
-            paritycheckmatrix.append(row)
-        paritycheckmatrix = np.array(paritycheckmatrix)
+            self.paritycheckmatrix.append(row)
+        self.paritycheckmatrix = np.array(self.paritycheckmatrix)
+        # print('Parity Matrix', self.paritycheckmatrix)
         # print('Size of parity check matrix: ' + str(paritycheckmatrix.shape))
         # print('Rank of parity check matrix: ' + str(np.linalg.matrix_rank(paritycheckmatrix)))
        
         if infonodeindices is None:
-            systematicmatrix = self.eliminationgf2(paritycheckmatrix)
+            systematicmatrix = self.eliminationgf2(self.paritycheckmatrix)
             #print(systematicmatrix)
             self.__paritycolindices = []
             paritynodeindices = []
@@ -544,12 +545,12 @@ class Encoding(BipartiteGraph):
         self.__maxdepth = len(self.__ParityNodeIndices)
 
         # print('Number of parity nodes: ' + str(len(set(self.__ParityNodeIndices))))
-        self.__pc_parity = paritycheckmatrix[:, self.__paritycolindices]
+        self.__pc_parity = self.paritycheckmatrix[:, self.__paritycolindices]
         # print('Rank parity component: ' + str(np.linalg.matrix_rank(self.__pc_parity)))
         #print(self.__pc_parity)
 
         # print('Number of information nodes: ' + str(len(set(self.__InfoNodeIndices))))
-        self.__pc_info = paritycheckmatrix[:, self.__infocolindices]
+        self.__pc_info = self.paritycheckmatrix[:, self.__infocolindices]
         # print('Rank info component: ' + str(np.linalg.matrix_rank(self.__pc_info)))
         #print(self.__pc_info)
 
