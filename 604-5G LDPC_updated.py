@@ -59,19 +59,25 @@ class NR_1_0_8(fgSiva.Encoding):
 EbNo_dB = np.arange(0,2.5,0.5)
 EbNo = np.zeros(len(EbNo_dB))
 
-# Define parameters for Monte Carlo simulatons
-
-n_err = 0
-n_iter = 0
+# Store error values per point 
 
 err_values = np.zeros(len(EbNo_dB))
-err_fixed = 0
 
-err_req = 25
+# Number of error acuumulations
+
+err_acc = 25
 
 for point in range(len(EbNo_dB)):
+    
+    # Define parameters for Monte Carlo simulatons
+    
+    err_fixed = 0
 
-    while n_err < err_req:
+    n_err = 0
+
+    n_iter = 0
+
+    while n_err < err_acc:
 
         # Variance calculation :
 
@@ -180,12 +186,12 @@ for point in range(len(EbNo_dB)):
 
     err_values[point] = err_fixed/(n_iter*N)
 
-    #print(n_iter,err_values[point],EbNo_dB[point])
+    print(n_iter,err_values[point],EbNo_dB[point])
 
     file=open(os.path.join(current_dir,'values.txt'),'w')
     file.write(str(err_values[point])+"\n")
-    file.close()
-
+    
+file.close()
 
 # BER VS EbNo_dB plot
 
@@ -195,7 +201,7 @@ plt.xlabel('EbNo_dB')
 plt.ylabel('Bit error rate : Codeword')
 plt.title('Monte-Carlo simulations')
 
-# plt.show()
+plt.show()
 
 
 
