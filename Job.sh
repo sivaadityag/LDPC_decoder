@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=LDPC                                    
-#SBATCH --time=48:00:00                                           
+#SBATCH --time=12:00:00                                           
 #SBATCH --ntasks=56                                            
 #SBATCH --ntasks-per-node=28                                    
 #SBATCH --mem=56G 
@@ -14,4 +14,4 @@ cd research/
 source venv/bin/activate
 cd LDPC_decoder/
 
-python LDPC_HW.py
+python 604_5G_LDPC_updated.py
