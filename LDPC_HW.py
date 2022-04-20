@@ -102,7 +102,7 @@ class NR_1_0_8(fgSiva.Encoding):
 # In[ ]:
 
 
-EbNo_dB = np.arange(0,2.5,0.5)
+EbNo_dB = np.arange(-5,-4,0.5)
 
 
 # # Run the encoding and decoding
@@ -163,7 +163,7 @@ for i in range(len(EbNo_dB)):
                 LDPCFactorGraph.setobservation(varnodeid, Pxi_1)
         # LDPCFactorGraph.printgraphcontent()
         # Run message-passing algorithm on graph
-        numIterations = 25
+        numIterations = 10
         for idxiteration in range(numIterations):
             LDPCFactorGraph.updatechecks()
             LDPCFactorGraph.updatevars()
